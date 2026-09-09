@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta
+      name="description"
+      content="WebCrunch, a fast keyboard-first browser calculator."
+    />
+    <title>WebCrunch</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <main class="calculator-shell">
+      <section
+        class="history-panel"
+        aria-labelledby="history-title"
+        tabindex="-1"
+      >
+        <div class="history-heading">
+          <h1 id="history-title" class="sr-only">Calculation history</h1>
+          <div class="toolbar">
+            <button
+              id="clear-history"
+              class="text-button"
+              type="button"
+              title="Clear history (Ctrl/Cmd+Shift+L)"
+            >
+              Clear
+            </button>
+            <details id="settings" class="settings">
+              <summary id="settings-summary">Settings</summary>
+              <div class="settings-panel">
+                <label class="setting-row" for="language-select">
+                  <span id="language-label">Language</span>
+                  <select id="language-select">
+                    <option value="en">English</option>
+                    <option value="fi">Suomi</option>
+                    <option value="sv">Svenska</option>
+                  </select>
+                </label>
+                <label class="setting-row" for="font-select">
+                  <span id="font-label">Font</span>
+                  <select id="font-select">
+                    <option id="font-mono-option" value="mono">Monospace</option>
+                    <option id="font-sans-option" value="sans">Sans serif</option>
+                    <option id="font-serif-option" value="serif">Serif</option>
+                  </select>
+                </label>
+                <label class="setting-row" for="font-size-input">
+                  <span id="font-size-label">Size</span>
+                  <select id="font-size-input">
+                    <option value="80">80%</option>
+                    <option value="100" selected>100%</option>
+                    <option value="120">120%</option>
+                    <option value="140">140%</option>
+                    <option value="160">160%</option>
+                  </select>
+                </label>
+                <label class="setting-row" for="angle-mode-select">
+                  <span id="angle-mode-label">Angle</span>
+                  <select id="angle-mode-select">
+                    <option id="radians-option" value="rad">Radians</option>
+                    <option id="degrees-option" value="deg">Degrees</option>
+                  </select>
+                </label>
+                <p id="credits" class="credits">
+                  WebCrunch · Based on SpeedCrunch · GPL-2.0-or-later
+                </p>
+              </div>
+            </details>
+          </div>
+        </div>
+        <ol id="history" class="history-list"></ol>
+        <p id="empty-history" class="empty-history">No calculations yet.</p>
+      </section>
+
+      <section class="workbench" aria-labelledby="expression-label">
+        <div id="autocomplete" class="autocomplete" hidden>
+          <ul id="autocomplete-list" role="listbox"></ul>
+          <p id="autocomplete-help">Tab completes the suggestion</p>
+        </div>
+        <output id="result" for="expression"></output>
+        <p id="error-message" class="error-message" role="status"></p>
+        <div class="expression-row">
+          <span class="prompt" aria-hidden="true">›</span>
+          <label id="expression-label" class="sr-only" for="expression">
+            Expression
+          </label>
+          <input
+            id="expression"
+            name="expression"
+            type="text"
+            inputmode="text"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            aria-describedby="input-help error-message"
+            aria-autocomplete="list"
+            aria-controls="autocomplete-list"
+            aria-expanded="false"
+            autofocus
+          />
+        </div>
+        <p id="input-help" class="input-help">
+          <kbd>Enter</kbd> <span id="calculate-label">calculate</span> ·
+          <kbd>↑</kbd>/<kbd>↓</kbd> <span id="history-label">history</span> ·
+          <kbd>Esc</kbd> <span id="clear-input-label">clear input</span>
+        </p>
+      </section>
+    </main>
+
+    <div id="announcement" class="sr-only" aria-live="polite"></div>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

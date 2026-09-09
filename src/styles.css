@@ -1,0 +1,422 @@
+:root {
+  color-scheme: dark;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-synthesis: none;
+  --background: #21071b;
+  --panel: #2c0824;
+  --input: #340a2b;
+  --text: #f5edf3;
+  --muted: #a7899e;
+  --line: #542044;
+  --result: #67b8e8;
+  --accent: #c2b600;
+  --focus: #d4c800;
+  --error: #ff6c73;
+  --calculator-font: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --calculator-size: 1.5rem;
+}
+
+:root[data-calculator-font="sans"] {
+  --calculator-font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+:root[data-calculator-font="serif"] {
+  --calculator-font: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-width: 320px;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--text);
+  background: var(--background);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.calculator-shell {
+  display: flex;
+  flex-direction: column;
+  width: min(960px, 100%);
+  height: 100vh;
+  min-height: 420px;
+  margin: 0 auto;
+  background: var(--panel);
+}
+
+.history-panel {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-color: var(--line) transparent;
+}
+
+.history-heading {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  display: flex;
+  justify-content: flex-end;
+  min-height: 40px;
+  padding: 8px 12px;
+  background: linear-gradient(var(--panel) 55%, transparent);
+}
+
+.toolbar {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.text-button {
+  align-self: flex-start;
+  padding: 4px 7px;
+  border: 0;
+  border-radius: 3px;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.72rem;
+}
+
+.text-button:hover,
+.text-button:focus-visible,
+.settings summary:hover,
+.settings summary:focus-visible {
+  color: var(--text);
+  outline: 1px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.settings {
+  position: relative;
+}
+
+.settings summary {
+  padding: 4px 7px;
+  border-radius: 3px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.72rem;
+  list-style: none;
+}
+
+.settings summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-panel {
+  position: absolute;
+  z-index: 4;
+  top: calc(100% + 7px);
+  right: 0;
+  width: min(300px, calc(100vw - 24px));
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #26081f;
+  box-shadow: 0 12px 30px rgb(8 0 6 / 45%);
+}
+
+.setting-row {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 34px;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.setting-row select {
+  width: 100%;
+  padding: 5px 7px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  color: var(--text);
+  background: var(--input);
+  font: inherit;
+}
+
+.credits {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.62rem;
+  line-height: 1.45;
+}
+
+.history-list {
+  margin: 0;
+  padding: 12px clamp(18px, 4vw, 40px) 28px;
+  list-style: none;
+}
+
+.history-list li + li {
+  margin-top: 24px;
+}
+
+.history-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  width: 100%;
+  color: var(--text);
+  font-family: var(--calculator-font);
+  text-align: left;
+}
+
+.history-content {
+  min-width: 0;
+  cursor: text;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.history-reuse {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.6;
+}
+
+.history-reuse:hover,
+.history-reuse:focus-visible {
+  color: var(--text);
+  outline: 1px solid var(--focus);
+  outline-offset: 1px;
+  opacity: 1;
+}
+
+.history-expression,
+.history-result {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: var(--calculator-size);
+  line-height: 1.45;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.history-expression {
+  color: var(--text);
+}
+
+.history-result {
+  color: var(--result);
+  font-variant-numeric: tabular-nums;
+}
+
+.history-result::before {
+  color: var(--accent);
+  content: "= ";
+}
+
+.empty-history {
+  position: absolute;
+  inset: 50% 20px auto;
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-align: center;
+  transform: translateY(-50%);
+}
+
+.workbench {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  padding: 14px clamp(18px, 4vw, 40px) 12px;
+  border-top: 1px solid var(--line);
+  background: var(--input);
+  box-shadow: 0 -16px 32px rgb(14 0 11 / 24%);
+}
+
+.autocomplete {
+  position: absolute;
+  right: clamp(18px, 4vw, 40px);
+  bottom: calc(100% - 1px);
+  left: clamp(18px, 4vw, 40px);
+  max-height: min(250px, 42vh);
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 4px 4px 0 0;
+  background: #26081f;
+  box-shadow: 0 -12px 28px rgb(8 0 6 / 35%);
+}
+
+.autocomplete[hidden] {
+  display: none;
+}
+
+#autocomplete-list {
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+}
+
+.autocomplete-option {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 2px;
+  color: var(--text);
+  background: transparent;
+  font-family: var(--calculator-font);
+  text-align: left;
+  cursor: pointer;
+}
+
+.autocomplete-option:hover,
+.autocomplete-option:focus-visible,
+.autocomplete-option.is-active {
+  outline: none;
+  background: var(--line);
+}
+
+.autocomplete-kind {
+  color: var(--muted);
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 0.68rem;
+}
+
+#autocomplete-help {
+  padding: 6px 12px 8px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+#result {
+  display: block;
+  min-height: 1.45em;
+  margin-bottom: 6px;
+  overflow-wrap: anywhere;
+  color: var(--result);
+  font-family: var(--calculator-font);
+  font-size: var(--calculator-size);
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+}
+
+#result:empty {
+  display: none;
+}
+
+#result.is-preview {
+  opacity: 0.78;
+}
+
+#result::first-letter {
+  color: var(--accent);
+}
+
+.expression-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.prompt {
+  color: var(--accent);
+  font-family: var(--calculator-font);
+  font-size: var(--calculator-size);
+  line-height: 1;
+}
+
+#expression {
+  display: block;
+  width: 100%;
+  padding: 4px 0 7px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  outline: none;
+  color: var(--text);
+  background: transparent;
+  caret-color: var(--text);
+  font-family: var(--calculator-font);
+  font-size: var(--calculator-size);
+}
+
+#expression:focus {
+  border-color: var(--focus);
+}
+
+#expression[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+.error-message {
+  min-height: 1.25em;
+  margin: 5px 0 0 26px;
+  color: var(--error);
+  font-size: 0.8rem;
+}
+
+.input-help {
+  margin: 5px 0 0 26px;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+kbd {
+  color: var(--text);
+  font-family: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-height: 520px) {
+  .input-help {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .history-heading {
+    min-height: 34px;
+  }
+
+  .history-list {
+    padding-top: 6px;
+  }
+
+  .history-list li + li {
+    margin-top: 18px;
+  }
+}
