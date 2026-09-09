@@ -90,3 +90,11 @@ Open <http://127.0.0.1:4173>.
 ```sh
 npm run check
 ```
+
+## Relationship to SpeedCrunch
+
+WebCrunch is an independent browser-based calculator inspired by
+[SpeedCrunch](https://bitbucket.org/heldercorreia/speedcrunch/).
+
+The original SpeedCrunch source code is maintained separately and is licensed
+under GPL-2.0-or-later. WebCrunch is not an official SpeedCrunch release.
