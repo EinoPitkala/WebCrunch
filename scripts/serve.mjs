@@ -12,7 +12,6 @@ const contentTypes = {
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".svg": "image/svg+xml",
-  ".wasm": "application/wasm",
 };
 
 const server = createServer((request, response) => {

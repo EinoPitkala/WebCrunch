@@ -1,8 +1,8 @@
 # WebCrunch
 
-A keyboard-first calculator prototype for a browser-based examination
-environment. WebCrunch preserves the essential interaction of SpeedCrunch
-before the maintained C++ engine is connected through WebAssembly.
+A keyboard-first calculator for browser-based examination environments.
+WebCrunch is an independent web application inspired by SpeedCrunch's fast,
+keyboard-driven interaction.
 
 ## Current scope
 
