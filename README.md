@@ -1,3 +1,23 @@
+<img width="150" height="150" alt="favicon" src="https://github.com/user-attachments/assets/49a9063e-c714-427e-92f9-2f2f7a5ee336" /><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <rect width="64" height="64" rx="14" fill="#21071b" />
+  <rect x="1" y="1" width="62" height="62" rx="13" fill="none" stroke="#542044" stroke-width="2" />
+  <path
+    d="m15 18 12 14-12 14"
+    fill="none"
+    stroke="#c2b600"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="6"
+  />
+  <path
+    d="M34 25h17M34 39h17"
+    fill="none"
+    stroke="#67b8e8"
+    stroke-linecap="round"
+    stroke-width="5"
+  />
+</svg>
+
 # WebCrunch
 
 A keyboard-first calculator for browser-based examination environments.
