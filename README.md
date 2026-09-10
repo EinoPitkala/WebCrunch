@@ -53,8 +53,8 @@ keyboard-driven interaction.
 - Installable as a standalone app on supported browsers
 - Full calculator shell cached for offline use after the first visit
 
-There are deliberately no units, CAS features, keypad, file operations, or
-network dependencies in this first slice.
+The calculator is meant to be used in the A section of mathematics in Finnish matriculation exam,
+where CAS calculators are disabled. 
 
 ## Definitions
 
