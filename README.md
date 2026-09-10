@@ -30,6 +30,8 @@ keyboard-driven interaction.
 - Ctrl/Cmd+Shift+L to clear the session
 - Live result preview while typing
 - History expressions and results are normal selectable, copyable text
+- Installable as a standalone app on supported browsers
+- Full calculator shell cached for offline use after the first visit
 
 There are deliberately no units, CAS features, keypad, file operations, or
 network dependencies in this first slice.
@@ -84,6 +86,11 @@ npm run dev
 ```
 
 Open <http://127.0.0.1:4173>.
+
+The local server uses `localhost`, which browsers treat as a secure context, so
+the service worker and install flow can be tested without HTTPS. Production
+deployments must use HTTPS. After loading the app once, enable offline mode in
+browser developer tools and reload to verify the cached calculator shell.
 
 ## Verify
 

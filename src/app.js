@@ -11,6 +11,7 @@ import {
   translate,
   translateCalculatorError,
 } from "./i18n.js";
+import { registerServiceWorker } from "./pwa.js";
 
 const expressionInput = document.querySelector("#expression");
 const resultOutput = document.querySelector("#result");
@@ -490,3 +491,4 @@ clearHistoryButton.addEventListener("click", clearSession);
 applyAppearance();
 applyTranslations();
 preview();
+registerServiceWorker();
