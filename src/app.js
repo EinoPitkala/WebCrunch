@@ -1,3 +1,4 @@
+import { handleLatexPaste, LatexPasteError } from "./latex.js";
 import { applyCompletion, findCompletions } from "./autocomplete.js";
 import {
   BUILTIN_FUNCTIONS,
@@ -221,7 +222,7 @@ function commit() {
 
 function showError(error) {
   const message =
-    error instanceof CalculatorSyntaxError
+    error instanceof CalculatorSyntaxError || error instanceof LatexPasteError
       ? translateCalculatorError(state.locale, error)
       : t("unableToCalculate");
 
@@ -395,6 +396,10 @@ function acceptCompletion(suggestion = state.autocompleteSuggestions[0]) {
   expressionInput.focus();
   preview();
 }
+
+expressionInput.addEventListener("paste", (event) => {
+  handleLatexPaste(event, expressionInput, showError);
+});
 
 expressionInput.addEventListener("input", () => {
   state.historyIndex = state.history.length;

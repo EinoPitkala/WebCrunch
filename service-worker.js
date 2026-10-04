@@ -1,4 +1,4 @@
-const CACHE_NAME = "webcrunch-shell-v2";
+const CACHE_NAME = "webcrunch-shell-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -10,6 +10,7 @@ const APP_SHELL = [
   "./src/app.js",
   "./src/autocomplete.js",
   "./src/calculator.js",
+  "./src/latex.js",
   "./src/abicus-engine.js",
   "./src/i18n.js",
   "./src/pwa.js",

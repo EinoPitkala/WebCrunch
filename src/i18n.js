@@ -49,6 +49,7 @@ const messages = {
     alreadyFunction: "{name} is already a function",
     invalidFunctionParameter: "Invalid function parameter",
     uniqueFunctionArguments: "Function arguments must be unique",
+    unsupportedLatex: "Unsupported or incomplete LaTeX. Paste a numeric expression using fractions, roots, powers, or supported functions.",
     unableToCalculate: "Unable to calculate this expression",
   },
   fi: {
@@ -99,6 +100,7 @@ const messages = {
     alreadyFunction: "{name} on jo funktio",
     invalidFunctionParameter: "Virheellinen funktion parametri",
     uniqueFunctionArguments: "Funktion argumenttien on oltava yksilöllisiä",
+    unsupportedLatex: "LaTeX-lauseke on puutteellinen tai sitä ei tueta. Liitä numeerinen lauseke, jossa on murtolukuja, juuria, potensseja tai tuettuja funktioita.",
     unableToCalculate: "Lauseketta ei voitu laskea",
   },
   sv: {
@@ -149,6 +151,7 @@ const messages = {
     alreadyFunction: "{name} är redan en funktion",
     invalidFunctionParameter: "Ogiltig funktionsparameter",
     uniqueFunctionArguments: "Funktionsargumenten måste vara unika",
+    unsupportedLatex: "LaTeX-uttrycket är ofullständigt eller stöds inte. Klistra in ett numeriskt uttryck med bråk, rötter, potenser eller funktioner som stöds.",
     unableToCalculate: "Det gick inte att beräkna uttrycket",
   },
 };
