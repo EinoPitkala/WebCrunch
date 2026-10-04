@@ -36,6 +36,7 @@ test("document advertises the manifest and service worker caches valid files", (
   const shell = JSON.parse(shellMatch[1]);
   assert(shell.includes("./manifest.webmanifest"));
   assert(shell.includes("./src/pwa.js"));
+  assert(shell.includes("./src/abicus-engine.js"));
 
   for (const asset of shell.filter((path) => path !== "./")) {
     assert(existsSync(resolve(root, asset)), `Missing cached asset: ${asset}`);

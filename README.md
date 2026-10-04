@@ -99,7 +99,8 @@ the local browser; calculations and definitions remain session-only.
 
 ## Run locally
 
-Requires Node.js 20 or newer. No package installation is necessary.
+Requires Node.js 22.12 or newer for development and verification.
+The checked-in browser bundle runs without network dependencies.
 
 ```sh
 npm run dev
@@ -115,6 +116,7 @@ browser developer tools and reload to verify the cached calculator shell.
 ## Verify
 
 ```sh
+npm ci
 npm run check
 ```
 
@@ -125,3 +127,16 @@ WebCrunch is an independent browser-based calculator inspired by
 
 The original SpeedCrunch source code is maintained separately and is licensed
 under GPL-2.0-or-later. WebCrunch is not an official SpeedCrunch release.
+
+## Numeric engine
+
+Calculations use the [Abicus engine](https://github.com/digabi/abicus), vendored
+at a pinned revision with its MIT license and original tests. Its Decimal-based
+evaluator uses 500-digit precision. Results display up to 21 significant digits;
+variables and `ans` retain the full result. WebCrunch supplies the session and
+input compatibility layer; it no longer performs arithmetic with JavaScript
+numbers. See [engine provenance and build instructions](vendor/abicus/README.md).
+
+After changing the vendored engine, run `npm run build:engine` and commit the
+updated `src/abicus-engine.js` together with its source. Static hosting continues
+to work without a build step or runtime CDN dependencies.

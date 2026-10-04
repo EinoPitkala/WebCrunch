@@ -1,3 +1,5 @@
+import { Decimal, evaluate as abicusEvaluate } from "./abicus-engine.js";
+
 export class CalculatorSyntaxError extends Error {
   constructor(message, position, code = "unableToCalculate", values = {}) {
     super(message);
@@ -80,72 +82,43 @@ function functionDomainError(name, position) {
   );
 }
 
+// All numerical operations, constants, and scientific functions are evaluated by Abicus.
+function engine(tokens, angleMode = "rad", position = 0) {
+  const result = abicusEvaluate(tokens, new Decimal(0), new Decimal(0), angleMode);
+  if (result.isOk()) return result.value;
+  const errors = {
+    UNEXPECTED_EOF: ["Expression is incomplete", "incompleteExpression"],
+    NO_RHS_BRACKET: ["Missing closing parenthesis", "missingClosingParenthesis"],
+    NOT_A_NUMBER: ["Function is undefined for these arguments", "functionDomain"],
+    TRIG_PRECISION: ["Function is undefined for these arguments", "functionDomain"],
+    INFINITY: ["Result is outside the supported range (possibly division by zero)", "resultOutOfRange"],
+  };
+  const [message, code] = errors[result.error] ?? ["Unexpected expression", "unableToCalculate"];
+  throw new CalculatorSyntaxError(message, position, code);
+}
+const literal = value => ({ type: "litr", value: new Decimal(value) });
+const operator = name => ({ type: "oper", name });
 function evaluateBuiltinFunction(name, args, angleMode, position) {
-  const toRadians = (value) =>
-    angleMode === "deg" ? (value * Math.PI) / 180 : value;
-  const fromRadians = (value) =>
-    angleMode === "deg" ? (value * 180) / Math.PI : value;
-
-  switch (name) {
-    case "sqrt":
-      if (args[0] < 0) functionDomainError(name, position);
-      return Math.sqrt(args[0]);
-    case "cbrt":
-      return Math.cbrt(args[0]);
-    case "nthrt": {
-      const [value, degree] = args;
-      if (
-        !Number.isInteger(degree) ||
-        degree === 0 ||
-        (value < 0 && Math.abs(degree) % 2 === 0) ||
-        (value === 0 && degree < 0)
-      ) {
-        functionDomainError(name, position);
-      }
-      return Math.sign(value) * Math.abs(value) ** (1 / degree);
-    }
-    case "log":
-      if (args.length === 1) {
-        if (args[0] <= 0) functionDomainError(name, position);
-        return Math.log10(args[0]);
-      }
-      if (args[0] <= 0 || args[0] === 1 || args[1] <= 0) {
-        functionDomainError(name, position);
-      }
-      return Math.log(args[1]) / Math.log(args[0]);
-    case "ln":
-      if (args[0] <= 0) functionDomainError(name, position);
-      return Math.log(args[0]);
-    case "sin":
-      return Math.sin(toRadians(args[0]));
-    case "cos":
-      return Math.cos(toRadians(args[0]));
-    case "tan": {
-      const angle = toRadians(args[0]);
-      if (Math.abs(Math.cos(angle)) < 1e-15) {
-        functionDomainError(name, position);
-      }
-      return Math.tan(angle);
-    }
-    case "arcsin":
-      if (Math.abs(args[0]) > 1) functionDomainError(name, position);
-      return fromRadians(Math.asin(args[0]));
-    case "arccos":
-      if (Math.abs(args[0]) > 1) functionDomainError(name, position);
-      return fromRadians(Math.acos(args[0]));
-    case "arctan":
-      return fromRadians(Math.atan(args[0]));
-    default:
-      throw new CalculatorSyntaxError(
-        `Unknown name “${name}”`,
-        position,
-        "unknownName",
-        { name },
-      );
+  const aliases = { arcsin: "asin", arccos: "acos", arctan: "atan", nthrt: "root", cbrt: "root", log: "log10" };
+  if (name === "nthrt" && (!args[1].isInteger() || args[1].isZero() || (args[0].isZero() && args[1].isNegative()))) functionDomainError(name, position);
+  if (name === "log" && args.length === 2) {
+    if (args[0].lte(0) || args[0].eq(1) || args[1].lte(0)) functionDomainError(name, position);
+    return engine([...functionTokens("ln", [args[1]]), operator("/"), ...functionTokens("ln", [args[0]])], angleMode, position);
+  }
+  if ((name === "log" || name === "ln") && args[0].lte(0)) functionDomainError(name, position);
+  if (name === "cbrt") args = [...args, new Decimal(3)];
+  try {
+    return engine(functionTokens(aliases[name] ?? name, args), angleMode, position);
+  } catch (error) {
+    if (error.code === "functionDomain") error.values = { name };
+    throw error;
   }
 }
+function functionTokens(name, args) {
+  return [{ type: "func", name }, { type: "lbrk" }, ...args.flatMap((value, i) => i ? [{ type: "semi" }, literal(value)] : [literal(value)]), { type: "rbrk" }];
+}
 
-class Parser {
+class ExpressionAdapter {
   constructor(source, context) {
     this.source = source;
     this.context = normalizeContext(context);
@@ -174,56 +147,36 @@ class Parser {
   }
 
   parseAdditive() {
-    let value = this.parseMultiplicative();
-
+    const tokens = [];
+    let needsOperand = true;
     while (true) {
-      if (this.consume("+")) {
-        value += this.parseMultiplicative();
-      } else if (this.consume("-")) {
-        value -= this.parseMultiplicative();
+      this.skipWhitespace();
+      const character = this.source[this.position];
+      if (character === undefined || /[);,]/.test(character)) break;
+      if (/[+*/^−×÷-]/.test(character)) {
+        this.position += 1;
+        const name = ({ "−": "-", "×": "*", "÷": "/" })[character] ?? character;
+        if (!(needsOperand && name === "+")) tokens.push(operator(name));
+        needsOperand = true;
       } else {
-        return this.ensureFinite(value);
-      }
-    }
-  }
-
-  parseMultiplicative() {
-    let value = this.parseUnary();
-
-    while (true) {
-      if (this.consume("*")) {
-        value *= this.parseUnary();
-      } else if (this.consume("/")) {
-        const divisorPosition = this.position;
-        const divisor = this.parseUnary();
-        if (divisor === 0) {
-          throw new CalculatorSyntaxError(
-            "Division by zero",
-            divisorPosition,
-            "divisionByZero",
-          );
+        if (!needsOperand) {
+          if (!this.hasImplicitFactorAhead()) break;
+          tokens.push(operator("*"));
         }
-        value /= divisor;
-      } else if (this.hasImplicitFactorAhead()) {
-        value *= this.parseUnary();
-      } else {
-        return this.ensureFinite(value);
+        tokens.push(literal(this.parsePrimary()));
+        needsOperand = false;
       }
     }
+    return engine(tokens, this.context.angleMode, this.position);
   }
 
+  // Compact log syntax consumes one signed power expression.
   parseUnary() {
-    if (this.consume("+")) return this.parseUnary();
-    if (this.consume("-")) return -this.parseUnary();
-    return this.parsePower();
-  }
-
-  parsePower() {
-    const base = this.parsePrimary();
-    if (!this.consume("^")) return base;
-
-    const exponent = this.parseUnary();
-    return this.ensureFinite(base ** exponent);
+    const tokens = [];
+    while (this.consume("-")) tokens.push(operator("-"));
+    tokens.push(literal(this.parsePrimary()));
+    if (this.consume("^")) tokens.push(operator("^"), literal(this.parseUnary()));
+    return engine(tokens, this.context.angleMode, this.position);
   }
 
   parsePrimary() {
@@ -255,7 +208,7 @@ class Parser {
         );
       }
 
-      const base = Number(subscriptLogMatch[1]);
+      const base = new Decimal(subscriptLogMatch[1]);
       const value = this.parseUnary();
       return this.ensureFinite(
         evaluateBuiltinFunction("log", [base, value], this.context.angleMode, start),
@@ -265,7 +218,7 @@ class Parser {
     const numberMatch = remainder.match(NUMBER_PATTERN);
     if (numberMatch) {
       this.position += numberMatch[0].length;
-      return Number(numberMatch[0]);
+      return new Decimal(numberMatch[0]);
     }
 
     const identifierMatch = remainder.match(IDENTIFIER_PATTERN);
@@ -394,7 +347,7 @@ class Parser {
     const callStack = new Set(this.context.callStack);
     callStack.add(name);
 
-    return new Parser(definition.body, {
+    return new ExpressionAdapter(definition.body, {
       ans: this.context.ans,
       variables: this.context.variables,
       functions: this.context.functions,
@@ -412,9 +365,9 @@ class Parser {
 
     switch (name) {
       case "pi":
-        return Math.PI;
+        return engine([{ type: "cons", name: "pi" }]);
       case "e":
-        return Math.E;
+        return engine([{ type: "cons", name: "e" }]);
       case "ans":
         if (this.context.ans === null || this.context.ans === undefined) {
           throw new CalculatorSyntaxError(
@@ -452,7 +405,7 @@ class Parser {
   }
 
   ensureFinite(value) {
-    if (!Number.isFinite(value)) {
+    if (!new Decimal(value).isFinite()) {
       throw new CalculatorSyntaxError(
         "Result is outside the supported range",
         this.position,
@@ -626,7 +579,7 @@ function defineVariables(parts, context) {
 }
 
 export function evaluateExpression(source, context = {}) {
-  return new Parser(source, context).parse();
+  return new ExpressionAdapter(source, context).parse();
 }
 
 export function evaluateStatement(source, context = {}) {
@@ -655,17 +608,9 @@ export function formatStatementResult(statement) {
 }
 
 export function formatResult(value) {
-  if (Object.is(value, -0) || value === 0) return "0";
-
-  const magnitude = Math.abs(value);
-  if (magnitude >= 1e15 || magnitude < 1e-9) {
-    return value
-      .toExponential(12)
-      .replace(/\.?(0+)(?=e)/, "")
-      .replace("e+", "e");
-  }
-
-  return Number(value.toPrecision(15)).toString();
+  const decimal = new Decimal(value);
+  if (decimal.isZero()) return "0";
+  return decimal.toSignificantDigits(21).toString().replace("e+", "e");
 }
 
 export function completeParentheses(source) {

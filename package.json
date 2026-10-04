@@ -6,10 +6,20 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/serve.mjs",
-    "test": "node --test",
-    "check": "node --check src/calculator.js && node --check src/autocomplete.js && node --check src/i18n.js && node --check src/pwa.js && node --check src/app.js && node --check service-worker.js && node --test"
+    "test": "node --test tests/*.test.js && vitest run",
+    "check": "npm run build:engine && node --check src/calculator.js && node --check src/autocomplete.js && node --check src/i18n.js && node --check src/pwa.js && node --check src/app.js && node --check service-worker.js && npm test",
+    "build:engine": "node scripts/build-engine.mjs"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12"
+  },
+  "dependencies": {
+    "decimal.js": "10.6.0",
+    "neverthrow": "8.2.0",
+    "ts-pattern": "5.9.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "vitest": "5.0.3"
   }
 }
