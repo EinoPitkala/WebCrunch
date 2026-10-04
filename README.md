@@ -42,6 +42,7 @@ keyboard-driven interaction.
 - Tab completion for constants and saved variables/functions
 - English, Finnish, and Swedish interface and calculator errors
 - Locally remembered calculator font, size, and angle-mode preferences
+- Paste LaTeX fractions, roots, powers, constants, and scientific functions
 - Enter to calculate
 - Missing closing parentheses are appended when Enter submits an expression
 - Enter focuses the expression field when the page background has focus
@@ -99,7 +100,8 @@ the local browser; calculations and definitions remain session-only.
 
 ## Run locally
 
-Requires Node.js 20 or newer. No package installation is necessary.
+Requires Node.js 22.12 or newer for development and verification.
+The checked-in browser bundle runs without network dependencies.
 
 ```sh
 npm run dev
@@ -115,6 +117,7 @@ browser developer tools and reload to verify the cached calculator shell.
 ## Verify
 
 ```sh
+npm ci
 npm run check
 ```
 
@@ -125,3 +128,35 @@ WebCrunch is an independent browser-based calculator inspired by
 
 The original SpeedCrunch source code is maintained separately and is licensed
 under GPL-2.0-or-later. WebCrunch is not an official SpeedCrunch release.
+
+## Numeric engine
+
+Calculations use the [Abicus engine](https://github.com/digabi/abicus), vendored
+at a pinned revision with its MIT license and original tests. Its Decimal-based
+evaluator uses 500-digit precision. Results display up to 21 significant digits;
+variables and `ans` retain the full result. WebCrunch supplies the session and
+input compatibility layer; it no longer performs arithmetic with JavaScript
+numbers. See [engine provenance and build instructions](vendor/abicus/README.md).
+
+After changing the vendored engine, run `npm run build:engine` and commit the
+updated `src/abicus-engine.js` together with its source. Static hosting continues
+to work without a build step or runtime CDN dependencies.
+
+## Pasting LaTeX
+
+Paste a mathematical LaTeX expression directly into the expression field. It is
+converted to editable calculator syntax at the cursor, replacing selected text.
+Plain-text calculator expressions paste normally. Press Enter to calculate;
+trigonometric functions use the selected angle mode.
+
+Supported notation includes nested `\frac`, `\dfrac`, `\tfrac`, `\sqrt{x}`,
+`\sqrt[n]{x}`, braced powers, `\pi`, `\cdot`, `\times`, `\div`, `\ln`,
+`\log_{b}`, and trigonometric functions (including `\sin^2(x)` and
+`\sin^{-1}(x)`). Math wrappers `$…$`, `$$…$$`, `\(…\)`, `\[…\]`, and
+`\left`/`\right` delimiters are accepted.
+
+For example, paste `\frac{3^{2}+4^{2}}{\sqrt{25}}` to calculate `5`.
+This is a numeric-expression converter, not a full LaTeX interpreter. Unsupported
+commands, matrices, units, symbolic operators, and incomplete groups are rejected
+with a message, leaving the current input unchanged. Write numbers without digit
+separators; ambiguous numeric spacing such as `1\,000` is rejected.
