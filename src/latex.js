@@ -109,7 +109,7 @@ export function convertLatexPaste(text) {
       }
     }
     const value = argument();
-    const call = base === null ? `${FUNCTIONS.get(name)}(${value})` : `log(${base};${value})`;
+    const call = base === null ? `${FUNCTIONS.get(name)}(${value})` : `log(${value};${base})`;
     return power === null ? call : `(${call})^(${power})`;
   }
 
