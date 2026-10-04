@@ -76,11 +76,14 @@ test("evaluates arbitrary-base logarithms with compact and explicit syntax", () 
   assertClose(evaluateExpression("log_5 125"), 3);
   assertClose(evaluateExpression("log_0.5 4"), -2);
   assertClose(evaluateExpression("log_2 (8 * 4)"), 5);
-  assertDecimal(evaluateExpression("log(2; 8)"), 3);
+  assertDecimal(evaluateExpression("log(8; 2)"), 3);
+  assertDecimal(evaluateExpression("log(1000; 10)"), 3);
+  assertDecimal(evaluateExpression("log(1; 2)"), 0);
+  assertClose(evaluateExpression("log(4; 0.5)"), -2);
 
   const context = { variables: new Map(), functions: new Map() };
   evaluateStatement("base=2", context);
-  assertDecimal(evaluateExpression("log(base; 8)", context), 3);
+  assertDecimal(evaluateExpression("log(8; base)", context), 3);
 });
 
 test("evaluates trigonometry in radians by default", () => {
@@ -132,9 +135,9 @@ test("validates built-in function arity and real-number domains", () => {
   assert.throws(() => evaluateExpression("nthrt(16; 0)"), /undefined/);
   assert.throws(() => evaluateExpression("arcsin(2)"), /undefined/);
   assert.throws(() => evaluateExpression("log(0)"), /undefined/);
-  assert.throws(() => evaluateExpression("log(1; 8)"), /undefined/);
-  assert.throws(() => evaluateExpression("log(-2; 8)"), /undefined/);
-  assert.throws(() => evaluateExpression("log(2; 0)"), /undefined/);
+  assert.throws(() => evaluateExpression("log(8; 1)"), /undefined/);
+  assert.throws(() => evaluateExpression("log(8; -2)"), /undefined/);
+  assert.throws(() => evaluateExpression("log(0; 2)"), /undefined/);
   assert.throws(() => evaluateExpression("log_1 8"), /undefined/);
   assert.throws(() => evaluateExpression("log_2"), /incomplete/);
   assert.throws(() => evaluateExpression("log()"), /expects 1 or 2 arguments/);

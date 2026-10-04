@@ -102,8 +102,8 @@ function evaluateBuiltinFunction(name, args, angleMode, position) {
   const aliases = { arcsin: "asin", arccos: "acos", arctan: "atan", nthrt: "root", cbrt: "root", log: "log10" };
   if (name === "nthrt" && (!args[1].isInteger() || args[1].isZero() || (args[0].isZero() && args[1].isNegative()))) functionDomainError(name, position);
   if (name === "log" && args.length === 2) {
-    if (args[0].lte(0) || args[0].eq(1) || args[1].lte(0)) functionDomainError(name, position);
-    return engine([...functionTokens("ln", [args[1]]), operator("/"), ...functionTokens("ln", [args[0]])], angleMode, position);
+    if (args[0].lte(0) || args[1].lte(0) || args[1].eq(1)) functionDomainError(name, position);
+    return engine([...functionTokens("ln", [args[0]]), operator("/"), ...functionTokens("ln", [args[1]])], angleMode, position);
   }
   if ((name === "log" || name === "ln") && args[0].lte(0)) functionDomainError(name, position);
   if (name === "cbrt") args = [...args, new Decimal(3)];
@@ -211,7 +211,7 @@ class ExpressionAdapter {
       const base = new Decimal(subscriptLogMatch[1]);
       const value = this.parseUnary();
       return this.ensureFinite(
-        evaluateBuiltinFunction("log", [base, value], this.context.angleMode, start),
+        evaluateBuiltinFunction("log", [value, base], this.context.angleMode, start),
       );
     }
 

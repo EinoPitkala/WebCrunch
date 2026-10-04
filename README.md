@@ -31,7 +31,7 @@ keyboard-driven interaction.
 - Decimal and scientific notation
 - Constants `pi` and `e`
 - Roots: `sqrt(x)`, `cbrt(x)`, and `nthrt(x; n)`
-- Logarithms: base-10 `log(x)`, natural `ln(x)`, and arbitrary-base `log_b x`
+- Logarithms: base-10 `log(x)`, natural `ln(x)`, and optional-base `log(x; base)`
 - Trigonometry: `sin`, `cos`, `tan`, `arcsin`, `arccos`, and `arctan`
 - Persistent radians/degrees angle mode; inverse functions use the same mode
 - Previous result through `ans`
@@ -84,8 +84,7 @@ cbrt(-27)             = -3
 nthrt(32; 5)          = 2
 log(1000)             = 3
 ln(e)                 = 1
-log_2 8               = 3
-log(2; 8)             = 3       (equivalent explicit syntax)
+log(8; 2)             = 3       (optional second argument sets the base)
 sin(pi / 2)           = 1       (radian mode)
 sin(30)               = 0.5     (degree mode)
 arctan(1)             = 45      (degree mode)
